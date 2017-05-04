@@ -371,7 +371,9 @@ abstract class BaseFacebook
     if (empty($access_token_response)) {
       return false;
     }
-      
+    
+    //Facebook GraphAPI Version 2.2 and down (Deprecated).  For more info, see http://stackoverflow.com/a/43016312/114558
+    /*
     $response_params = array();
     parse_str($access_token_response, $response_params);
     
@@ -383,6 +385,18 @@ abstract class BaseFacebook
     
     $this->setPersistentData(
       'access_token', $response_params['access_token']
+    );
+    */
+    //Facebook GraphAPI Version 2.3 and up.
+    $response = json_decode($access_token_response);
+    if (!isset($response->access_token)) {
+      return false;
+    }
+
+    $this->destroySession();
+
+    $this->setPersistentData(
+      'access_token', $response->access_token
     );
   }
 
@@ -778,7 +792,8 @@ abstract class BaseFacebook
     if (empty($access_token_response)) {
       return false;
     }
-
+    //Facebook GraphAPI Version 2.2 and down (Deprecated).  For more info, see http://stackoverflow.com/a/43016312/114558
+    /*
     $response_params = array();
     parse_str($access_token_response, $response_params);
     if (!isset($response_params['access_token'])) {
@@ -786,6 +801,13 @@ abstract class BaseFacebook
     }
 
     return $response_params['access_token'];
+    */
+    //Facebook GraphAPI Version 2.3 and up.
+    $response = json_decode($access_token_response);
+    if (!isset($response->access_token)) {
+        return false;
+    }
+    return $response->access_token;
   }
 
   /**
